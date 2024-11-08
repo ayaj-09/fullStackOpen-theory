@@ -1,4 +1,4 @@
-const baseUrl = 'https://notes-backend-ai07.onrender.com'
+const baseUrl = 'https://notes-backend-ai07.onrender.com/api/notes'
 import axios from "axios"
 
 const getAll = () => {
@@ -9,7 +9,7 @@ const getAll = () => {
 
 const createNote = (noteObject) => {
     return axios
-            .post(baseUrl,noteObject)
+            .post(`${baseUrl}/api/notes`,noteObject)
             .then(response=>response.data)
 }
 

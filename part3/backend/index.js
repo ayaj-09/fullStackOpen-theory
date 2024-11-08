@@ -33,11 +33,11 @@ let notes = [
     }
   ]
  
-// app.get('/',(request,response)=>{
-//   response.send('Hello world')
-// })
-
 app.get('/',(request,response)=>{
+  response.send('Hello world')
+})
+
+app.get('/api/notes',(request,response)=>{
   response.json(notes)
 })
 
