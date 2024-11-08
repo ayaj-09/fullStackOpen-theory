@@ -1,4 +1,4 @@
-const baseUrl = 'http://localhost:3001/notes'
+const baseUrl = 'http://localhost:3001/api/notes'
 import axios from "axios"
 
 const getAll = () => {
