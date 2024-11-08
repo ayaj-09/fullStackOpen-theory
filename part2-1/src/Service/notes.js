@@ -9,7 +9,7 @@ const getAll = () => {
 
 const createNote = (noteObject) => {
     return axios
-            .post(`${baseUrl}/api/notes`,noteObject)
+            .post(baseUrl,noteObject)
             .then(response=>response.data)
 }
 
