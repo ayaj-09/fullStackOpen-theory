@@ -1,4 +1,4 @@
-const baseUrl = 'http://localhost:3001/api/notes'
+const baseUrl = 'https://notes-backend-ai07.onrender.com'
 import axios from "axios"
 
 const getAll = () => {
