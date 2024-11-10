@@ -15,6 +15,17 @@ const requestLogger = (req,res,next) =>{
   console.log('---')
   next()
 }
+
+const errorHandler = (error,req,res,next)=>{
+  console.log(error.message)
+  if(error.name=='CastError'){
+    return res.status(400).send({error:'malformed ID'})
+  }
+  else if(error.name=='ValidationError'){
+    return res.status(400).json({error:error.split(':')})
+  }
+  next(error)
+}
 app.use(requestLogger)
 
  
@@ -28,42 +39,64 @@ app.get('/api/notes',(request,response)=>{
   })
 })
 
-app.get('/api/notes/:id',(req,res)=>{
-  const id = req.params.id
-  const note = notes.find(note=>note.id===id)
-  if(note){
-    res.json(note)
-  }
-  else{
-    res.status(404).end()
-  }
+app.get('/api/notes/:id',(req,res,next)=>{
+  Note.findById(req.params.id).then(note=>{
+    if(note){
+      res.json(note)
+    }
+    else{
+      res.status(404).end()
+    }
+  })
+  .catch(error=>{
+    next(error)
+  })
 })
 
-const generateId = () => {
-  const maxId = notes.length>0?Math.max(...notes.map(n=>n.id)):0
-  return String(maxId+1)
-}
 
-app.post('/api/notes',(req,res)=>{
+app.post('/api/notes',(req,res,next)=>{
   const body = req.body
-  if(!body.content){
-    return res.status(400).json({error:'Content missing'})
-  }
 
-  const note = {
+  const note = new Note({
     content:body.content,
-    important:Boolean(body.important),
-    id:generateId()
-  }
+    important:body.important
+  })
 
-  notes = notes.concat(note)
-  res.json(note)
+  note.save().then(savedNote =>{
+    res.json(savedNote)
+  })
+  .catch(error=>next(error))
 })
 
-app.delete('/api/notes/:id',(req,res)=>{
-  const id = req.params.id
-  notes = notes.filter(note=>note.id!==id)
-  res.status(204).end()
+app.delete('/api/notes/:id',(req,res,next)=>{
+  Note.findByIdAndDelete(req.params.id)
+  .then(result=>{
+    if(result){
+      res.status(204).end()
+    }
+    else{
+      res.status(404).end()
+    }  
+  })
+  .catch(error=>next(error))
+})
+
+app.put('/api/notes/:id',(req,res,next)=>{
+  const body = req.body
+  const note = {
+    content: body.content,
+    important:body.important
+  }
+  Note.findByIdAndUpdate(req.params.id,note,{new:true,runValidators:true,context:'query'})
+  .then(result=>{
+    if(result){
+      res.json(result)
+    }
+    else{
+      res.status(404).end()
+    } 
+  })
+  .catch(error=>next(error))
 })
 
 
@@ -72,6 +105,7 @@ const unknownEndPoint = (req,res,next)=>{
 }
 
 app.use(unknownEndPoint)
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT,()=>{

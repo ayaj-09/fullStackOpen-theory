@@ -1,4 +1,5 @@
-get http://localhost:3001/api/notes
+GET http://localhost:3001/api/notes/672f40edde3fceacb12
+
 
 ###
 
@@ -11,4 +12,13 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:3001/api/notes/1
+DELETE http://localhost:3001/api/notes/672f40edde3fcea53c61cb12
+
+###
+PUT http://localhost:3001/api/notes/672f543aabbea52e94b0698b
+Content-Type: application/json
+
+{
+    "content":"roh",
+    "important":true
+}
